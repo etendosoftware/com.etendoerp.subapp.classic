@@ -1,0 +1,51 @@
+/**
+*   This file was generated automatically by the 'createModuleBuild' task.
+*   Created at: 2025-01-14T14:17:25.282131Z.
+*
+*   WARNING: Do not put your credentials directly in this file.
+*
+*/
+
+group          = "com.etendoerp"
+version        = "1.0.0"
+description    = "Etendo Classic Sub-application"
+ext.artifact   = "subapp.classic"
+ext.repository = "https://maven.pkg.github.com/etendosoftware/com.etendoerp.mobile.extensions"
+
+configurations {
+    moduleDependencyContainer
+}
+
+publishing {
+    publications {
+        "com.etendoerp.subapp.classic"(MavenPublication) {
+            from components.java
+            groupId    = group
+            artifactId = artifact
+            version    = version
+        }
+    }
+    repositories {
+        maven {
+            url "https://maven.pkg.github.com/etendosoftware/com.etendoerp.mobile.extensions"
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://maven.pkg.github.com/etendosoftware/com.etendoerp.mobile.extensions"
+    }
+}
+
+/**
+* Declare Java dependencies using 'implementation'
+* Ex: implementation "com.sun.mail:javax.mail:1.6.2"
+*/
+dependencies {
+    implementation('com.smf:mobile.scan:1.6.0')
+    implementation('com.etendoerp:dynamic.app:1.7.0')
+
+    implementation('com.etendoerp.platform:etendo-core:[23.2.0,25.1.0)')
+}
