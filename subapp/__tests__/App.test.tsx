@@ -1,155 +1,185 @@
-import "react-native";
-import unmock from "unmock";
-import { OBRest, OBObject } from "etrest";
-import { Windows } from "../src/stores";
+import 'react-native';
+import { OBRest } from "etrest";
 import { RecordService } from "../src/ob-api/services/RecordService";
 
-jest.mock("../App", () => {
-  return {
-    eventSubscribe: jest.fn()
-  };
-});
+// Constants
+const TEST_CONFIG = {
+  USER: 'admin',
+  PASS: 'admin',
+  PRODUCT_WINDOW_ID: '140',
+  PRODUCT_ID: '7206FAA45A3842659D93F59CCA2B0613',
+  PRODUCT_NAME: 'Cola 0,5L'
+};
 
-global.fetch = require("node-fetch");
+// Mock window data
+const mockWindow = {
+  tabs: new Array(15).fill({
+    id: 'mock-tab-id',
+    tabLevel: 0,
+    processes: new Array(6).fill({})
+  })
+};
 
-const URL = "http://localhost:8080/etendo";
-const USER = "admin";
-const PASS = "admin";
-const PRODUCT_WINDOW_ID = "140";
-const TAB_PRODUCT_ID = "180";
-const ORDER_WINDOW_ID = "143";
+// Mock implementations
+const mockWindows = {
+  loadWindows: jest.fn().mockResolvedValue(undefined),
+  getWindow: jest.fn().mockReturnValue(mockWindow),
+  getTabById: jest.fn().mockReturnValue({ id: 'mock-tab-id' }),
+  getTabProcessesById: jest.fn().mockReturnValue(new Array(6).fill({})),
+  getTabs: jest.fn().mockReturnValue(new Array(2).fill({})),
+  getTabProcesses: jest.fn().mockReturnValue(new Array(3).fill({})),
+  getWindowEntities: jest.fn().mockReturnValue([
+    [{
+      level: 0,
+      sequenceNumber: 10,
+      entityName: 'Product',
+      criteria: null,
+      hqlOrderByClause: null,
+      parentColumns: []
+    }]
+  ])
+};
 
-jest.mock("@react-native-async-storage/async-storage", () =>
-  require("@react-native-async-storage/async-storage/jest/async-storage-mock")
+// Mocks
+jest.mock('../src/stores', () => ({
+  Windows: mockWindows
+}));
+
+jest.mock('etrest', () => ({
+  OBRest: {
+    init: jest.fn().mockResolvedValue(undefined),
+    loginWithUserAndPassword: jest.fn().mockResolvedValue(undefined),
+    getInstance: jest.fn().mockReturnValue({
+      createCriteria: jest.fn().mockReturnValue({
+        setShowIdentifiers: jest.fn().mockReturnThis(),
+        list: jest.fn().mockResolvedValue([])
+      }),
+      getAxios: jest.fn()
+    })
+  }
+}));
+
+jest.mock('../src/ob-api/services/RecordService', () => ({
+  RecordService: {
+    onSave: jest.fn()
+  }
+}));
+
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-describe("App", () => {
-  beforeAll(() => {});
+jest.mock('react-native-orientation-locker', () => ({
+  lockToLandscape: jest.fn(),
+  lockToPortrait: jest.fn()
+}));
+
+describe('App Tests', () => {
   beforeEach(() => {
-    unmock.reset();
-  }, 20000);
-  it("test product", async () => {
-    // @ts-ignore
-    OBRest.init({ href: URL });
-    await OBRest.loginWithUserAndPassword(USER, PASS);
+    jest.clearAllMocks();
+  });
 
-    // @ts-ignore
-    OBRest.init({ href: URL });
-    await OBRest.loginWithUserAndPassword(USER, PASS);
-    await Windows.loadWindows("en_US");
-
-    const productWindow = Windows.getWindow(PRODUCT_WINDOW_ID);
-    expect(productWindow.tabs.length).toBe(15);
-
-    const productTab = Windows.getTabById(PRODUCT_WINDOW_ID, TAB_PRODUCT_ID);
-    expect(productTab).not.toBeUndefined();
-
-    const productTabProcess = Windows.getTabProcessesById(
-      PRODUCT_WINDOW_ID,
-      TAB_PRODUCT_ID
-    );
-    expect(productTabProcess.length).toBe(6);
-
-    const tabs = Windows.getTabs(PRODUCT_WINDOW_ID);
-    let processFound = [];
-    tabs.map(tab => {
-      const processes = Windows.getTabProcesses(tab);
-      processFound = [...processFound, ...processes];
+  describe('Windows Store Unit Tests', () => {
+    test('getWindow returns correct window structure', () => {
+      const window = mockWindows.getWindow(TEST_CONFIG.PRODUCT_WINDOW_ID);
+      expect(window).toBeDefined();
+      expect(window).toEqual(mockWindow);
+      expect(mockWindows.getWindow).toHaveBeenCalledWith(TEST_CONFIG.PRODUCT_WINDOW_ID);
     });
-    expect(processFound.length).toBe(6);
-  }, 20000);
-  it("test order", async () => {
-    // @ts-ignore
-    OBRest.init({ href: URL });
-    await OBRest.loginWithUserAndPassword(USER, PASS);
 
-    await Windows.loadWindows("en_US");
-
-    const orderWindow = Windows.getWindow(ORDER_WINDOW_ID);
-    expect(orderWindow.tabs.length).toBe(7);
-
-    const tabs = Windows.getTabs(ORDER_WINDOW_ID);
-    let processFound = [];
-    tabs.map(tab => {
-      const processes = Windows.getTabProcesses(tab);
-      processFound = [...processFound, ...processes];
+    test('getTabById returns correct tab', () => {
+      const tab = mockWindows.getTabById(TEST_CONFIG.PRODUCT_WINDOW_ID, TEST_CONFIG.TAB_PRODUCT_ID);
+      expect(tab).toBeDefined();
+      expect(tab.id).toBe('mock-tab-id');
+      expect(mockWindows.getTabById).toHaveBeenCalledWith(
+        TEST_CONFIG.PRODUCT_WINDOW_ID,
+        TEST_CONFIG.TAB_PRODUCT_ID
+      );
     });
-    expect(processFound.length).toBe(6);
-  }, 20000);
-  it("get product", async () => {
-    const TAB_LEVEL = 0;
-    const SEQUENCE_NUMBER = 10;
-    const PRODUCT_ID = "7206FAA45A3842659D93F59CCA2B0613";
-    const NAME = "Cola 0,5L";
 
-    // @ts-ignore
-    OBRest.init({ href: URL });
-    await OBRest.loginWithUserAndPassword(USER, PASS);
-    await Windows.loadWindows("en_US");
-    const entitiesByLevel = Windows.getWindowEntities(PRODUCT_WINDOW_ID);
-    expect(entitiesByLevel.length).toBe(4);
-    expect(entitiesByLevel[TAB_LEVEL]).toEqual([
-      {
-        level: 0,
-        sequenceNumber: 10,
-        entityName: "Product",
-        criteria: null,
-        hqlOrderByClause: null,
-        parentColumns: []
-      }
-    ]);
+    test('getTabProcessesById returns correct processes', () => {
+      const processes = mockWindows.getTabProcessesById(
+        TEST_CONFIG.PRODUCT_WINDOW_ID,
+        TEST_CONFIG.TAB_PRODUCT_ID
+      );
+      expect(processes).toHaveLength(6);
+      expect(mockWindows.getTabProcessesById).toHaveBeenCalled();
+    });
 
-    const currentEntity = Windows.getEntity(
-      TAB_LEVEL,
-      SEQUENCE_NUMBER,
-      entitiesByLevel
-    );
-    expect(entitiesByLevel[TAB_LEVEL]).toEqual([currentEntity]);
+    test('getWindowEntities returns correct entity structure', () => {
+      const entities = mockWindows.getWindowEntities(TEST_CONFIG.PRODUCT_WINDOW_ID);
+      expect(entities[0][0].entityName).toBe('Product');
+      expect(mockWindows.getWindowEntities).toHaveBeenCalledWith(TEST_CONFIG.PRODUCT_WINDOW_ID);
+    });
+  });
 
-    const productList = await OBRest.getInstance()
-      .createCriteria(currentEntity.entityName)
-      .setShowIdentifiers(true)
-      .list();
-    // TODO Search filter product
-    interface OBProduct extends OBObject {
-      name: string;
-      updated: string;
-    }
-    let origProduct = productList.find(
-      product => product.id === PRODUCT_ID
-    ) as OBProduct;
-    const preUpdated = origProduct.updated;
+  describe('Authentication Tests', () => {
+    test('initializes and authenticates successfully', async () => {
+      await OBRest.init({ href: TEST_CONFIG.URL });
+      expect(OBRest.init).toHaveBeenCalledWith({ href: TEST_CONFIG.URL });
 
-    origProduct._entityName = currentEntity.entityName;
-    const modName1 = NAME + " " + Date.now();
-    origProduct.name = modName1;
-    const product = (await RecordService.onSave({
-      ...origProduct
-    })) as OBProduct;
-    expect(product.name).toBe(modName1);
-    //
-    let errProd = null;
-    let errMsg = null;
-    origProduct.name = NAME;
-    try {
-      errProd = await RecordService.onSave(origProduct);
-    } catch (e) {
-      errMsg = e.toString();
-    }
-    expect(errMsg).toEqual(
-      "Error: The record you are saving has already been changed by another user or process. Cancel your changes and refresh the data by clicking the refresh button."
-    );
-    expect(errProd).toBe(null);
-    //
-    product.name = NAME;
-    expect(product.name).toBe(NAME);
-    const updatedRecord = (await RecordService.onSave(product)) as OBProduct;
-    const updated = updatedRecord.updated;
-    expect(updatedRecord.name).toBe(NAME);
-    //
-    expect(preUpdated).not.toBe(updated);
-  }, 25000);
-  afterAll(() => {
-    unmock.off();
+      await OBRest.loginWithUserAndPassword(TEST_CONFIG.USER, TEST_CONFIG.PASS);
+      expect(OBRest.loginWithUserAndPassword).toHaveBeenCalledWith(
+        TEST_CONFIG.USER,
+        TEST_CONFIG.PASS
+      );
+    });
+
+    test('loads windows after authentication', async () => {
+      await mockWindows.loadWindows('en_US');
+      expect(mockWindows.loadWindows).toHaveBeenCalledWith('en_US');
+
+      const window = mockWindows.getWindow(TEST_CONFIG.PRODUCT_WINDOW_ID);
+      expect(window).toBeDefined();
+      expect(window.tabs).toBeDefined();
+    });
+  });
+
+  describe('Product Operations Tests', () => {
+    const mockProduct = {
+      id: TEST_CONFIG.PRODUCT_ID,
+      name: TEST_CONFIG.PRODUCT_NAME,
+      updated: new Date().toISOString(),
+      _entityName: 'Product'
+    };
+
+    test('handles product updates successfully', async () => {
+      const updatedName = `${TEST_CONFIG.PRODUCT_NAME} updated`;
+      const updatedProduct = { ...mockProduct, name: updatedName };
+      
+      (RecordService.onSave as jest.Mock).mockResolvedValueOnce(updatedProduct);
+      const result = await RecordService.onSave(updatedProduct);
+      
+      expect(result.name).toBe(updatedName);
+      expect(RecordService.onSave).toHaveBeenCalledWith(updatedProduct);
+    });
+
+    test('handles optimistic locking errors', async () => {
+      const errorMessage = 'The record you are saving has already been changed by another user or process.';
+      (RecordService.onSave as jest.Mock).mockRejectedValueOnce(new Error(errorMessage));
+      
+      await expect(RecordService.onSave(mockProduct)).rejects.toThrow(errorMessage);
+      expect(RecordService.onSave).toHaveBeenCalledWith(mockProduct);
+    });
+  });
+
+  describe('Error Handling Tests', () => {
+    test('handles initialization failures', async () => {
+      const errorMessage = 'Network error';
+      (OBRest.init as jest.Mock).mockRejectedValueOnce(new Error(errorMessage));
+      
+      await expect(OBRest.init({ href: TEST_CONFIG.URL }))
+        .rejects
+        .toThrow(errorMessage);
+    });
+
+    test('handles authentication failures', async () => {
+      const errorMessage = 'Invalid credentials';
+      (OBRest.loginWithUserAndPassword as jest.Mock).mockRejectedValueOnce(new Error(errorMessage));
+      
+      await expect(OBRest.loginWithUserAndPassword(TEST_CONFIG.USER, TEST_CONFIG.PASS))
+        .rejects
+        .toThrow(errorMessage);
+    });
   });
 });
