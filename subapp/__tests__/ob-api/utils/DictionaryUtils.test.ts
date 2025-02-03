@@ -1,7 +1,7 @@
-import record from '../../../../__tests__/mockdata/bprecord.json'
-import fields from "../../../../__tests__/mockdata/bprecordfields.json";
+import record from '../../mockdata/bprecord.json'
+import fields from "../../mockdata/bprecordfields.json";
 import recordExpected from './bpexpected.json'
-import { DictionaryUtils } from '../DictionaryUtils'
+import { DictionaryUtils } from '../../../src/ob-api/utils/DictionaryUtils' 
 
 describe("Dictionary Utils", () => {
   test("test cbpartner convertion", () => {

@@ -63,7 +63,7 @@ yarn-error.log
 .metro-health-check*
 
 # testing
-/coverage
+subapp/coverage
 build/
 !build/classes/
 etendo.artifact.properties

@@ -1,5 +1,5 @@
-import bpprocess from "../../../../__tests__/mockdata/bpproc_setnewcurrency.json";
-import ProcessUtils from "../ProcessUtils";
+import bpprocess from "../../mockdata/bpproc_setnewcurrency.json";
+import ProcessUtils from "../../../src/ob-api/utils/ProcessUtils";
 
 describe("User context test", () => {
   test("Get context in process", () => {

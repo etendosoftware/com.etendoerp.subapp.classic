@@ -31,6 +31,9 @@ module.exports = {
     "!**/*.test.{ts,tsx}",
     "!**/__tests__/**/*",
     "!**/*.spec.{ts,tsx}",
+    "!src/**/constants/*",
+    "!src/**/constants.ts*",
+    "!src/**/references.ts",
     "App.tsx"
   ],
   transformIgnorePatterns: [

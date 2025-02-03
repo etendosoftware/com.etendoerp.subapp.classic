@@ -1,8 +1,8 @@
-import bprecord from "../../../__tests__/mockdata/bprecord.json";
-import bprecordfields from "../../../__tests__/mockdata/bprecordfields.json";
-import process from "../../../__tests__/mockdata/bpproc_setnewcurrency.json";
-import UserUtils from "../utils/UserUtils";
-import ProcessUtils from "../../ob-api/utils/ProcessUtils";
+import bprecord from "../../mockdata/bprecord.json";
+import bprecordfields from "../../mockdata/bprecordfields.json";
+import process from "../../mockdata/bpproc_setnewcurrency.json";
+import UserUtils from "../../../src/stores/utils/UserUtils";
+import ProcessUtils from "../../../src/ob-api/utils/ProcessUtils";
 
 const user = {
   data: {

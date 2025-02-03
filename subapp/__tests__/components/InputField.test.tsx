@@ -1,11 +1,11 @@
 import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
-import { FieldMode } from "../components/Field";
-import { InputField } from "../components/InputField";
-import FormContext from "../contexts/FormContext";
+import { FieldMode } from "../../src/components/Field";
+import { InputField } from "../../src/components/InputField";
+import FormContext from "../../src/contexts/FormContext";
 import "@testing-library/jest-dom";
-import { References } from "../constants/References";
-import { Field } from "../types";
+import { References } from "../../src/constants/References";
+import { Field } from "../../src/types";
 
 let field: Field = {
   id: "",
