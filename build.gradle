@@ -7,7 +7,7 @@
 */
 
 group          = "com.etendoerp"
-version        = "1.0.0"
+version        = "1.1.0"
 description    = "Etendo Classic Sub-application"
 ext.artifact   = "subapp.classic"
 ext.repository = "https://maven.pkg.github.com/etendosoftware/com.etendoerp.mobile.extensions"
@@ -44,7 +44,7 @@ repositories {
 * Ex: implementation "com.sun.mail:javax.mail:1.6.2"
 */
 dependencies {
-    implementation('com.smf:mobile.scan:1.6.0')
+    implementation('com.smf:mobile.scan:1.7.0')
     implementation('com.etendoerp:dynamic.app:1.8.0')
 
     implementation('com.etendoerp.platform:etendo-core:[23.2.0,25.1.0)')
