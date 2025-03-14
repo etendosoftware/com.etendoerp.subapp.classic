@@ -13,7 +13,7 @@ export default {
   input: "./App.tsx",
   output: [
     {
-      file: "../web/com.etendoerp.subapp.classic/default.js",
+      file: "../web/com.etendoerp.subapp.classic/dist.js",
       format: "cjs",
       exports: "auto",
       strict: false,

@@ -66,20 +66,18 @@ export default class Drawer extends React.Component<Props, State> {
       organization: ""
     };
     observe(Windows, change => {
-      let loading = true;
-      if (Windows.menuItems.length > 0) {
-        loading = false;
-      }
-      if (this.state.loadingMenu !== loading) {
-        this.setState({ loadingMenu: loading });
-      }
+      const loading = Windows.menuItems.length === 0;
+      this.setState({
+        loadingMenu: loading,
+        menuItems: Windows.menuItems
+      });
     });
   }
 
   componentDidMount = async () => {
     const organization = await this.getOrganizationName();
     this.setState({ organization });
-    if (this.state.menuItems === []) {
+    if (this.state.menuItems.length === 0) {
       this.setState({ loadingMenu: true });
     } else {
       this.setState({ loadingMenu: false });
