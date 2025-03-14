@@ -7,7 +7,7 @@
 */
 
 group          = "com.etendoerp"
-version        = "1.1.0"
+version        = "1.1.1"
 description    = "Etendo Classic Sub-application"
 ext.artifact   = "subapp.classic"
 ext.repository = "https://maven.pkg.github.com/etendosoftware/com.etendoerp.mobile.extensions"
