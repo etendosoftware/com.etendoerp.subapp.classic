@@ -45,7 +45,7 @@ repositories {
 */
 dependencies {
     implementation('com.smf:mobile.scan:2.2.0')
-    implementation('com.etendoerp:dynamic.app:2.1.0')
+    implementation('com.etendoerp:dynamic.app:2.2.0')
 
-    implementation('com.etendoerp.platform:etendo-core:[25.1.0,25.3.0)')
+    implementation('com.etendoerp.platform:etendo-core:[25.1.0,25.4.0)')
 }
