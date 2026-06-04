@@ -10,7 +10,7 @@ group          = "com.etendoerp"
 version        = "3.0.0"
 description    = "Etendo Classic Sub-application"
 ext.artifact   = "subapp.classic"
-ext.repository = "https://maven.pkg.github.com/etendosoftware/com.etendoerp.mobile.extensions"
+ext.repository = "https://repo.futit.cloud/repository/maven-snapshots"
 
 configurations {
     moduleDependencyContainer
@@ -27,7 +27,7 @@ publishing {
     }
     repositories {
         maven {
-            url "https://maven.pkg.github.com/etendosoftware/com.etendoerp.mobile.extensions"
+            url "https://repo.futit.cloud/repository/maven-snapshots"
         }
     }
 }
@@ -35,7 +35,7 @@ publishing {
 repositories {
     mavenCentral()
     maven {
-        url "https://maven.pkg.github.com/etendosoftware/com.etendoerp.mobile.extensions"
+        url "https://repo.futit.cloud/repository/maven-snapshots"
     }
 }
 
@@ -45,7 +45,7 @@ repositories {
 */
 dependencies {
     implementation('com.smf:mobile.scan:3.0.0')
-    implementation('com.etendoerp:dynamic.app:3.0.0')
+    implementation('com.etendoerp:dynamic.app:3.0.0-SNAPSHOT')
 
-    implementation('com.etendoerp.platform:etendo-core:[26.1.0,26.2.0)')
+    implementation('com.etendoerp.platform:etendo-core:[27.1.0,27.2.0)')
 }
