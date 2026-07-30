@@ -1,7 +1,7 @@
 import React from "react";
 import { FlatList, View, StyleSheet } from "react-native";
 import { Windows } from "../stores";
-import { ActivityIndicator, Colors, FAB, withTheme } from "react-native-paper";
+import { ActivityIndicator, MD2Colors as Colors, FAB, withTheme } from "react-native-paper";
 import locale from "../i18n/locale";
 import { OBRest } from "etrest";
 import { IOBDalEntity, OBDal } from "../ob-api/classes/OBDal";

@@ -5,7 +5,7 @@ import { User, Windows } from "../stores";
 import {
   Appbar,
   Button,
-  Colors,
+  MD2Colors as Colors,
   Menu,
   Portal,
   Snackbar,

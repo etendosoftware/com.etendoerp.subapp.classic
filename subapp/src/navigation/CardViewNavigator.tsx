@@ -23,20 +23,27 @@ const CardViewStackNavigator = props => {
       {
         // @ts-ignore
         <Stack.Screen
-          params={props.route.params}
           options={{
             cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
           }}
           name={routeName}
         >
           {props => {
-            if (props.route.params == null || parentProps.route.params.reset) {
-              props.route.params = parentProps.route.params;
-            }
-            if (props.route.params?.reset) {
-              delete props.route.params.reset;
-            }
-            return <Screens.CardView {...props} theme={defaultTheme} />;
+            // react-navigation v7 freezes route/state objects in dev mode, so this can no
+            // longer mutate props.route.params directly (silently no-ops, leaving params
+            // undefined). Compute the effective params and pass a fresh route object instead.
+            const source =
+              props.route.params == null || parentProps.route.params?.reset
+                ? parentProps.route.params
+                : props.route.params;
+            const { reset, ...params } = source || {};
+            return (
+              <Screens.CardView
+                {...props}
+                route={{ ...props.route, params }}
+                theme={defaultTheme}
+              />
+            );
           }}
         </Stack.Screen>
       }
