@@ -12,11 +12,6 @@ import locale from "../i18n/locale";
 import { observe } from "mobx";
 import Icon from "react-native-vector-icons/Ionicons";
 import { defaultTheme } from "../themes";
-
-import("Etendo").then(e => {
-  Etendo = e.default;
-});
-
 import imgDrawer from "../img/drawer.png";
 import ShowProfilePicture from "./ShowProfilePicture";
 
@@ -60,9 +55,9 @@ export default class Drawer extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     this.state = {
-      menuItems: [],
-      loadingMenu: true,
-      userName: "",
+      menuItems: Windows.menuItems,
+      loadingMenu: Windows.menuItems.length === 0,
+      userName: User.data?.username || "",
       organization: ""
     };
     observe(Windows, change => {
@@ -77,11 +72,6 @@ export default class Drawer extends React.Component<Props, State> {
   componentDidMount = async () => {
     const organization = await this.getOrganizationName();
     this.setState({ organization });
-    if (this.state.menuItems.length === 0) {
-      this.setState({ loadingMenu: true });
-    } else {
-      this.setState({ loadingMenu: false });
-    }
   };
 
   componentDidUpdate = (_, prevState) => {
@@ -178,23 +168,22 @@ export default class Drawer extends React.Component<Props, State> {
             m2.reset = true;
 
             return (
-              <>
-                <View style={styles.drawerItemsContainer} key={index}>
+              <React.Fragment key={m.key}>
+                <View style={styles.drawerItemsContainer}>
                   <Icon name="md-folder" size={20} style={styles.iconColor} />
                   <DrawerItem
                     activeTintColor={DefaultTheme.colors.textSecondary}
                     inactiveTintColor={DefaultTheme.colors.textSecondary}
-                    key={m.key}
                     label={m.label}
                     labelStyle={styles.drawerText}
                     style={styles.drawerItem}
                     onPress={() => {
-                      Etendo.closeDrawer();
+                      this.props.navigation.closeDrawer();
                       this.props.navigation.navigate("CardView1", m2);
                     }}
                   />
                 </View>
-              </>
+              </React.Fragment>
             );
           })}
         <View style={styles.constantItems}></View>

@@ -210,6 +210,10 @@ const App = ({ ...props }) => {
     fetchData();
   }, []);
 
+  if (loading) {
+    return null;
+  }
+
   return (
     <>
       <AppO
