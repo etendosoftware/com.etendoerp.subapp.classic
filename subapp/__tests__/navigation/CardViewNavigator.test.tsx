@@ -10,16 +10,18 @@ jest.mock('../../src/screens', () => ({
   ProcessDialogScreen: jest.fn(() => null),
 }));
 
-// Mock createStackNavigator with proper route handling
+// Mock createStackNavigator matching real react-navigation v7 behavior: Stack.Screen has
+// no 'params' prop (only 'initialParams'), so a freshly pushed route's params start out
+// undefined regardless of any custom prop passed to Screen.
 jest.mock('@react-navigation/stack', () => ({
   createStackNavigator: () => ({
     Navigator: ({ children }) => children,
-    Screen: ({ children, name, ...rest }) => {
+    Screen: ({ children, name }) => {
       if (typeof children === 'function') {
         return children({
           route: {
             name,
-            params: rest.params || {},
+            params: undefined,
           },
           navigation: {
             navigate: jest.fn(),

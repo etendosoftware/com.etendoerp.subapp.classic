@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import {
   Snackbar as PaperSnackbar,
-  Colors,
+  MD2Colors as Colors,
   withTheme
 } from "react-native-paper";
 import locale from "../i18n/locale";
