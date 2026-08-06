@@ -12,6 +12,10 @@ const Stack = createStackNavigator();
 const CardViewStackNavigator = props => {
   const parentProps = props;
   const routeName = props.route.params.windowId;
+  // route/state objects are frozen (react-navigation dev mode), so the previous
+  // "delete params.reset after first use" trick silently no-ops. Track consumption
+  // by object identity instead of mutating the frozen params.
+  const consumedParentParams = React.useRef(null);
 
   return (
     <Stack.Navigator
@@ -29,13 +33,14 @@ const CardViewStackNavigator = props => {
           name={routeName}
         >
           {props => {
-            // react-navigation v7 freezes route/state objects in dev mode, so this can no
-            // longer mutate props.route.params directly (silently no-ops, leaving params
-            // undefined). Compute the effective params and pass a fresh route object instead.
-            const source =
-              props.route.params == null || parentProps.route.params?.reset
-                ? parentProps.route.params
-                : props.route.params;
+            const parentParams = parentProps.route.params;
+            const useParent =
+              props.route.params == null ||
+              (parentParams?.reset && consumedParentParams.current !== parentParams);
+            if (useParent) {
+              consumedParentParams.current = parentParams;
+            }
+            const source = useParent ? parentParams : props.route.params;
             const { reset, ...params } = source || {};
             return (
               <Screens.CardView

@@ -35,6 +35,13 @@ const fontConfig = {
 
 export const defaultTheme: Theme = {
   ...DefaultTheme,
+  // Runtime react-native-paper is v5 (MD3 by default). This theme's flat MD2-style
+  // colors (primary/surface/etc, no elevation scale) only render correctly under the
+  // MD2 code paths, so force those paths instead of MD3's (e.g. Appbar.Header ignores
+  // `dark` and paints theme.colors.surface under MD3, which is white here).
+  // PaperProvider derives isV3 from `version` (defaulting to 3) and overwrites any
+  // isV3 set directly, so `version: 2` is the actual switch — not `isV3`.
+  version: 2,
   roundness: 5,
   colors: {
     ...DefaultTheme.colors,
