@@ -12,6 +12,11 @@ const Stack = createStackNavigator();
 const CardViewStackNavigator = props => {
   const parentProps = props;
   const routeName = props.route.params.windowId;
+  // route/state objects can be frozen (react-navigation dev mode), so mutating
+  // props.route.params directly can silently no-op, leaving `reset` permanently
+  // true and every subsequent push ignoring its own params. Track consumption by
+  // object identity instead of mutating the (possibly frozen) params.
+  const consumedParentParams = React.useRef(null);
 
   return (
     <Stack.Navigator
@@ -30,13 +35,22 @@ const CardViewStackNavigator = props => {
           name={routeName}
         >
           {props => {
-            if (props.route.params == null || parentProps.route.params.reset) {
-              props.route.params = parentProps.route.params;
+            const parentParams = parentProps.route.params;
+            const useParent =
+              props.route.params == null ||
+              (parentParams?.reset && consumedParentParams.current !== parentParams);
+            if (useParent) {
+              consumedParentParams.current = parentParams;
             }
-            if (props.route.params?.reset) {
-              delete props.route.params.reset;
-            }
-            return <Screens.CardView {...props} theme={defaultTheme} />;
+            const source = useParent ? parentParams : props.route.params;
+            const { reset, ...params } = source || {};
+            return (
+              <Screens.CardView
+                {...props}
+                route={{ ...props.route, params }}
+                theme={defaultTheme}
+              />
+            );
           }}
         </Stack.Screen>
       }
